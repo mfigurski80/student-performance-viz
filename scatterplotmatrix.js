@@ -7,12 +7,12 @@
 // usage of this repo's license
 function ScatterplotMatrix(data, {
   columns = data.columns, // array of column names, or accessor functions
-  domain = undefined,
+  domain = undefined, // array of [lo,hi] ranges for each of ^^
   x = columns, // array of x-accessors
   y = columns, // array of y-accessors
   z = () => 1, // given d in data, returns the (categorical) z-value
-  xDomain = domain,
-  yDomain = domain,
+  xDomain = domain, // array of ranges
+  yDomain = domain, // array of ranges
   padding = 20, // separation between adjacent cells, in pixels
   dataPadding = 5, // separation between cell start and data points
   marginTop = 10, // top margin, in pixels
@@ -31,7 +31,6 @@ function ScatterplotMatrix(data, {
   const X = d3.map(x, x => d3.map(data, typeof x === "function" ? x : d => d[x]));
   const Y = d3.map(y, y => d3.map(data, typeof y === "function" ? y : d => d[y]));
   const Z = d3.map(data, z);
-  // TODO: Compute matching X/Y columns (to show density plot instead)
 
   // Compute default z-domain, and unique the z-domain.
   if (zDomain === undefined) zDomain = Z;
@@ -83,6 +82,7 @@ function ScatterplotMatrix(data, {
       .attr("y2", -height + marginTop + marginBottom)
       .attr("stroke-opacity", 0.1))
 
+  
   const cell = svg.append("g")
     .selectAll("g")
     .data(d3.cross(d3.range(X.length), d3.range(Y.length)))
@@ -97,13 +97,35 @@ function ScatterplotMatrix(data, {
     .attr("height", cellHeight);
 
   cell.each(function ([x, y]) {
-    d3.select(this).selectAll("circle")
-      .data(I.filter(i => !isNaN(X[x][i]) && !isNaN(Y[y][i])))
-      .join("circle")
-      .attr("r", 3.5)
-      .attr("cx", i => xScales[x](X[x][i]))
-      .attr("cy", i => yScales[y](Y[y][i]))
-      .attr("fill", i => zScale(Z[i]));
+    if (x == y && columns) {
+      // TODO: somehow remap density to scale
+      // TODO: split density plot based on Z values
+      const kde = kernelDensityEstimator(kernelEpanechnikov(7), xScales[x].ticks(20))
+      const density =  kde(X[x])
+      console.log(density)
+      d3.select(this).append("path")
+        .attr("class", "mypath")
+        .datum(density)
+        .attr("fill", "#69b3a2")
+        .attr("opacity", ".8")
+        .attr("stroke", "#000")
+        .attr("stroke-width", 1)
+        .attr("stroke-linejoin", "round")
+        .attr("d",  d3.line()
+          .curve(d3.curveBasis)
+          .x(d => xScales[x](d[0]))
+          .y(d => yScales[y](d[1]))
+        );
+
+    } else {
+      d3.select(this).selectAll("circle")
+        .data(I.filter(i => !isNaN(X[x][i]) && !isNaN(Y[y][i])))
+        .join("circle")
+        .attr("r", 3.5)
+        .attr("cx", i => xScales[x](X[x][i]))
+        .attr("cy", i => yScales[y](Y[y][i]))
+        .attr("fill", i => zScale(Z[i]));
+    }
   });
 
   // TODO Support labeling for asymmetric sploms?
@@ -121,4 +143,22 @@ function ScatterplotMatrix(data, {
     .text(d => d);
 
   return Object.assign(svg.node(), { scales: { color: zScale } });
+}
+
+
+// Function to compute density, from 
+// https://d3-graph-gallery.com/graph/density_basic.html
+function kernelDensityEstimator(kernel, X) {
+  return function(V) {
+    let v = X.map(function(x) {
+      return [x, 2500 * d3.mean(V, v => kernel(x - v))]
+    })
+    v.push([v[v.length-1][0], 0])
+    return v
+  };
+}
+function kernelEpanechnikov(k) {
+  return function(v) {
+    return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0
+  }
 }
