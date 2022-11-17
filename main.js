@@ -9,6 +9,7 @@ async function main() {
 
   const scplt_matrix = ScatterplotMatrix(data, {
     columns: ["reading score", "writing score", "math score"],
+    domain: [[0,100], [0,100], [0,100]],
     z: d => d.gender,
   })
   plotNode.appendChild(scplt_matrix)

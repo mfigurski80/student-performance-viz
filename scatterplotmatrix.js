@@ -1,12 +1,20 @@
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/splom
+ 
+// This version has been modified from the
+// original -- these changes fall under 
+// usage of this repo's license
 function ScatterplotMatrix(data, {
   columns = data.columns, // array of column names, or accessor functions
+  domain = undefined,
   x = columns, // array of x-accessors
   y = columns, // array of y-accessors
   z = () => 1, // given d in data, returns the (categorical) z-value
+  xDomain = domain,
+  yDomain = domain,
   padding = 20, // separation between adjacent cells, in pixels
+  dataPadding = 5, // separation between cell start and data points
   marginTop = 10, // top margin, in pixels
   marginRight = 20, // right margin, in pixels
   marginBottom = 30, // bottom margin, in pixels
@@ -23,6 +31,7 @@ function ScatterplotMatrix(data, {
   const X = d3.map(x, x => d3.map(data, typeof x === "function" ? x : d => d[x]));
   const Y = d3.map(y, y => d3.map(data, typeof y === "function" ? y : d => d[y]));
   const Z = d3.map(data, z);
+  // TODO: Compute matching X/Y columns (to show density plot instead)
 
   // Compute default z-domain, and unique the z-domain.
   if (zDomain === undefined) zDomain = Z;
@@ -36,8 +45,12 @@ function ScatterplotMatrix(data, {
   const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding) / Y.length;
 
   // Construct scales and axes.
-  const xScales = X.map(X => xType(d3.extent(X), [0, cellWidth]));
-  const yScales = Y.map(Y => yType(d3.extent(Y), [cellHeight, 0]));
+  const xScales = xDomain 
+    ? X.map((_, i) => xType(xDomain[i], [0+dataPadding, cellWidth-dataPadding]))
+    : X.map(X => xType(d3.extent(X), [0+dataPadding, cellWidth-dataPadding]));
+  const yScales = yDomain
+    ? Y.map((_, i) => yType(yDomain[i], [cellHeight-dataPadding, 0+dataPadding]))
+    : Y.map(Y => yType(d3.extent(Y), [cellHeight-dataPadding, 0+dataPadding]));
   const zScale = d3.scaleOrdinal(zDomain, colors);
   const xAxis = d3.axisBottom().ticks(cellWidth / 50);
   const yAxis = d3.axisLeft().ticks(cellHeight / 35);
