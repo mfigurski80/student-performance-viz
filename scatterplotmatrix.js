@@ -24,8 +24,9 @@ function ScatterplotMatrix(data, {
   xType = d3.scaleLinear, // the x-scale type
   yType = d3.scaleLinear, // the y-scale type
   zDomain, // array of z-values
-  fillOpacity = 0.7, // opacity of the dots
+  fillOpacity = 0.7, // opacity of the plots
   colors = d3.schemeCategory10, // array of colors for z
+  kdeBands = 10, // number of bands for density func
 } = {}) {
   // Compute values (and promote column names to accessors).
   const X = d3.map(x, x => d3.map(data, typeof x === "function" ? +x : d => +d[x]));
@@ -99,14 +100,14 @@ function ScatterplotMatrix(data, {
   cell.each(function ([x, y]) {
     if (x == y && columns) {
       // TODO: somehow remap density to scale
-      const kde = kernelDensityEstimator(kernelEpanechnikov(7), xScales[x].ticks(20))
+      const kde = kernelDensityEstimator(kernelEpanechnikov(kdeBands), xScales[x].ticks(20))
       const groups = Array.from(d3.group(X[x], (_, i) => Z[i]), ([k, v]) => [k, kde(v)])
       groups.forEach(([z, density]) => {
         d3.select(this).append("path")
           .attr("class", "mypath")
           .datum(density)
           .attr("fill", zScale(z))
-          .attr("opacity", ".8")
+          .attr("opacity", fillOpacity)
           .attr("stroke", "#000")
           .attr("stroke-width", 1)
           .attr("stroke-linejoin", "round")
