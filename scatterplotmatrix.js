@@ -28,8 +28,8 @@ function ScatterplotMatrix(data, {
   colors = d3.schemeCategory10, // array of colors for z
 } = {}) {
   // Compute values (and promote column names to accessors).
-  const X = d3.map(x, x => d3.map(data, typeof x === "function" ? x : d => d[x]));
-  const Y = d3.map(y, y => d3.map(data, typeof y === "function" ? y : d => d[y]));
+  const X = d3.map(x, x => d3.map(data, typeof x === "function" ? +x : d => +d[x]));
+  const Y = d3.map(y, y => d3.map(data, typeof y === "function" ? +y : d => +d[y]));
   const Z = d3.map(data, z);
 
   // Compute default z-domain, and unique the z-domain.
@@ -99,23 +99,23 @@ function ScatterplotMatrix(data, {
   cell.each(function ([x, y]) {
     if (x == y && columns) {
       // TODO: somehow remap density to scale
-      // TODO: split density plot based on Z values
       const kde = kernelDensityEstimator(kernelEpanechnikov(7), xScales[x].ticks(20))
-      const density =  kde(X[x])
-      console.log(density)
-      d3.select(this).append("path")
-        .attr("class", "mypath")
-        .datum(density)
-        .attr("fill", "#69b3a2")
-        .attr("opacity", ".8")
-        .attr("stroke", "#000")
-        .attr("stroke-width", 1)
-        .attr("stroke-linejoin", "round")
-        .attr("d",  d3.line()
-          .curve(d3.curveBasis)
-          .x(d => xScales[x](d[0]))
-          .y(d => yScales[y](d[1]))
-        );
+      const groups = Array.from(d3.group(X[x], (_, i) => Z[i]), ([k, v]) => [k, kde(v)])
+      groups.forEach(([z, density]) => {
+        d3.select(this).append("path")
+          .attr("class", "mypath")
+          .datum(density)
+          .attr("fill", zScale(z))
+          .attr("opacity", ".8")
+          .attr("stroke", "#000")
+          .attr("stroke-width", 1)
+          .attr("stroke-linejoin", "round")
+          .attr("d",  d3.line()
+            .curve(d3.curveBasis)
+            .x(d => xScales[x](d[0]))
+            .y(d => yScales[y](d[1]))
+          );
+      })
 
     } else {
       d3.select(this).selectAll("circle")
@@ -150,10 +150,8 @@ function ScatterplotMatrix(data, {
 // https://d3-graph-gallery.com/graph/density_basic.html
 function kernelDensityEstimator(kernel, X) {
   return function(V) {
-    let v = X.map(function(x) {
-      return [x, 2500 * d3.mean(V, v => kernel(x - v))]
-    })
-    v.push([v[v.length-1][0], 0])
+    let v = X.map(x => [x, 2500 * d3.mean(V, v => kernel(x - v))] )
+    v.push([v[v.length-1][0], 0]) // add final point to ensure area 
     return v
   };
 }
