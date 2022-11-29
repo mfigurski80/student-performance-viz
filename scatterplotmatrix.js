@@ -1,7 +1,7 @@
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/splom
- 
+
 // This version has been modified from the
 // original -- these changes fall under 
 // usage of this repo's license
@@ -14,7 +14,7 @@ function ScatterplotMatrix(data, {
   xDomain = domain, // array of ranges
   yDomain = domain, // array of ranges
   padding = 20, // separation between adjacent cells, in pixels
-  dataPadding = 5, // separation between cell start and data points
+  dataPadding = 5, // separation between border and data, in pixels
   marginTop = 10, // top margin, in pixels
   marginRight = 20, // right margin, in pixels
   marginBottom = 30, // bottom margin, in pixels
@@ -45,12 +45,12 @@ function ScatterplotMatrix(data, {
   const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding) / Y.length;
 
   // Construct scales and axes.
-  const xScales = xDomain 
-    ? X.map((_, i) => xType(xDomain[i], [0+dataPadding, cellWidth-dataPadding]))
-    : X.map(X => xType(d3.extent(X), [0+dataPadding, cellWidth-dataPadding]));
+  const xScales = xDomain
+    ? X.map((_, i) => xType(xDomain[i], [0 + dataPadding, cellWidth - dataPadding]))
+    : X.map(X => xType(d3.extent(X), [0 + dataPadding, cellWidth - dataPadding]));
   const yScales = yDomain
-    ? Y.map((_, i) => yType(yDomain[i], [cellHeight-dataPadding, 0+dataPadding]))
-    : Y.map(Y => yType(d3.extent(Y), [cellHeight-dataPadding, 0+dataPadding]));
+    ? Y.map((_, i) => yType(yDomain[i], [cellHeight - dataPadding, 0 + dataPadding]))
+    : Y.map(Y => yType(d3.extent(Y), [cellHeight - dataPadding, 0 + dataPadding]));
   const zScale = d3.scaleOrdinal(zDomain, colors);
   const xAxis = d3.axisBottom().ticks(cellWidth / 50);
   const yAxis = d3.axisLeft().ticks(cellHeight / 35);
@@ -83,7 +83,7 @@ function ScatterplotMatrix(data, {
       .attr("y2", -height + marginTop + marginBottom)
       .attr("stroke-opacity", 0.1))
 
-  
+
   const cell = svg.append("g")
     .selectAll("g")
     .data(d3.cross(d3.range(X.length), d3.range(Y.length)))
@@ -111,7 +111,7 @@ function ScatterplotMatrix(data, {
           .attr("stroke", "#000")
           .attr("stroke-width", 1)
           .attr("stroke-linejoin", "round")
-          .attr("d",  d3.line()
+          .attr("d", d3.line()
             .curve(d3.curveBasis)
             .x(d => xScales[x](d[0]))
             .y(d => yScales[y](d[1]))
@@ -150,14 +150,14 @@ function ScatterplotMatrix(data, {
 // Function to compute density, from 
 // https://d3-graph-gallery.com/graph/density_basic.html
 function kernelDensityEstimator(kernel, X) {
-  return function(V) {
-    let v = X.map(x => [x, 2500 * d3.mean(V, v => kernel(x - v))] )
-    v.push([v[v.length-1][0], 0]) // add final point to ensure area 
+  return function (V) {
+    let v = X.map(x => [x, 2500 * d3.mean(V, v => kernel(x - v))])
+    v.push([v[v.length - 1][0], 0]) // add final point to ensure area 
     return v
   };
 }
 function kernelEpanechnikov(k) {
-  return function(v) {
+  return function (v) {
     return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0
   }
 }

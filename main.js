@@ -6,6 +6,7 @@ const onSelectionChanged = (plotNode, data) => (selected) => {
     columns: ["reading score", "writing score", "math score"],
     domain: [[0, 100], [0, 100], [0, 100]],
     z: d => selectedColumns.map(key => d[key]).join(" "),
+    width: Math.min(window.innerHeight, window.innerWidth) * 0.9,
   })
   plotNode.innerHTML = ""
   plotNode.appendChild(scpltMatrix)
