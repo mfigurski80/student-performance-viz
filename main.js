@@ -1,12 +1,14 @@
 
-const onSelectionChanged = (plotNode, data) => (selected) => {
+const onSelectionChanged = (plotNode, data) => (selectedSplits, selectedFilters) => {
   // Update the plot with the selected values
-  const selectedColumns = Object.keys(selected).filter(key => selected[key])
-  const scpltMatrix = ScatterplotMatrix(data, {
+  const filters = Object.keys(selectedFilters).map(key => selectedFilters[key].map(val => [key, val])).flat()
+  const filteredData = data.filter(d => filters.every(([key, val]) => d[key] !== val))
+  // console.log(filteredData)
+  const scpltMatrix = ScatterplotMatrix(filteredData, {
     columns: ["reading score", "writing score", "math score"],
     domain: [[0, 100], [0, 100], [0, 100]],
-    z: d => selectedColumns.map(key => d[key]).join(" "),
-    width: Math.min(window.innerHeight, window.innerWidth) * 0.9,
+    z: d => selectedSplits.map(key => d[key]).join(" "),
+    width: Math.min(window.innerHeight * 0.9, window.innerWidth * 0.95),
   })
   plotNode.innerHTML = ""
   plotNode.appendChild(scpltMatrix)

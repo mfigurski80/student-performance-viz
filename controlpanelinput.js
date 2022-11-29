@@ -2,15 +2,18 @@
 function ControlPanelInput(data, onChange, {
   columns = data.columns ?? Object.keys(data[0]), // array of column names from data to allow selecting
   runOnChange = true, // whether to run onChange when the control panel is first created
-  defaultValues = {}, // default values for the control panel
+  defaultSplitValues = [], // default values for the control panel splits
+  defaultFilterValues = {}, // default values for the control panel filters
   labels = {}, // labels for the control panel
-  wrappingClass = "control-panel-input", // class to apply to the wrapping div
+  groupWrappingClass = "control-panel-input", // class to apply to wrap each group of controls
+  filterWrappingClass = "control-panel-input__filter", // class to apply to wrap each filter control
 } = {}) {
   const node = document.createElement("div")
   node.classList.add("control-panel")
 
-  // STATIC struct holding the state of the control panel
-  const INPUT_VALUES = defaultValues
+  // STATIC structs holding the state of the control panel
+  const SPLIT_INPUT_VALUES = defaultSplitValues
+  const FILTER_INPUT_VALUES = defaultFilterValues
 
   // Create each checkbox input for all columns of data
   columns.forEach(column => {
@@ -19,31 +22,59 @@ function ControlPanelInput(data, onChange, {
       return
     }
 
-    // setup value
-    INPUT_VALUES[column] = INPUT_VALUES[column] ?? false
-
     // create checkbox input elements
     const wrapper = document.createElement("div")
-    wrapper.classList.add(wrappingClass)
+    wrapper.classList.add(groupWrappingClass)
     node.appendChild(wrapper)
     const input = document.createElement("input")
     input.type = "checkbox"
     input.id = `${column}-checkbox`
-    input.checked = INPUT_VALUES[column] ?? true
+    input.checked = SPLIT_INPUT_VALUES.includes(column)
     wrapper.appendChild(input)
     const label = document.createElement("label")
     label.setAttribute("for", input.id)
     label.textContent = labels[column] ?? column
     wrapper.appendChild(label)
 
-    // add event listener to update INPUT_VALUES
+    // add event listener to update SPLIT_INPUT_VALUES
     input.addEventListener("change", (e) => {
-      INPUT_VALUES[column] = e.target.checked
-      onChange(INPUT_VALUES)
+      if (e.target.checked) SPLIT_INPUT_VALUES.push(column)
+      else SPLIT_INPUT_VALUES.splice(SPLIT_INPUT_VALUES.indexOf(column), 1)
+      onChange(SPLIT_INPUT_VALUES, FILTER_INPUT_VALUES)
+    })
+
+    // init filter inputs -- note inversed, ie if checked, doesn't appear in filter
+    const values = [...new Set(data.map(d => d[column]))]
+    if (!column in FILTER_INPUT_VALUES || typeof FILTER_INPUT_VALUES[column] !== 'object') {
+      FILTER_INPUT_VALUES[column] = []
+    }
+
+    // create filter input elements for each value in the column
+    values.forEach(value => {
+      // create checkbox input elements
+      const subwrapper = document.createElement("div")
+      subwrapper.classList.add(filterWrappingClass)
+      wrapper.appendChild(subwrapper)
+      const input = document.createElement("input")
+      input.type = "checkbox"
+      input.id = `${value}-checkbox`
+      input.checked = !FILTER_INPUT_VALUES[column].includes(value)
+      subwrapper.appendChild(input)
+      const label = document.createElement("label")
+      label.setAttribute("for", input.id)
+      label.textContent = value
+      subwrapper.appendChild(label)
+
+      // add event listener to update FILTER_INPUT_VALUES
+      input.addEventListener("change", (e) => {
+        if (e.target.checked) FILTER_INPUT_VALUES[column].splice(FILTER_INPUT_VALUES[column].indexOf(value), 1)
+        else FILTER_INPUT_VALUES[column].push(value)
+        onChange(SPLIT_INPUT_VALUES, FILTER_INPUT_VALUES)
+      })
     })
   })
 
   // run onChange with the initial values
-  if (runOnChange) onChange(INPUT_VALUES)
+  if (runOnChange) onChange(SPLIT_INPUT_VALUES, FILTER_INPUT_VALUES)
   return { node }
 }
