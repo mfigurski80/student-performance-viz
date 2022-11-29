@@ -3,6 +3,7 @@ function ControlPanelInput(data, onChange, {
   columns = data.columns ?? Object.keys(data[0]), // array of column names from data to allow selecting
   runOnChange = true, // whether to run onChange when the control panel is first created
   defaultValues = {}, // default values for the control panel
+  labels = {}, // labels for the control panel
   wrappingClass = "control-panel-input", // class to apply to the wrapping div
 } = {}) {
   const node = document.createElement("div")
@@ -32,7 +33,7 @@ function ControlPanelInput(data, onChange, {
     wrapper.appendChild(input)
     const label = document.createElement("label")
     label.setAttribute("for", input.id)
-    label.textContent = column
+    label.textContent = labels[column] ?? column
     wrapper.appendChild(label)
 
     // add event listener to update INPUT_VALUES
