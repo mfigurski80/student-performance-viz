@@ -16,8 +16,8 @@
 
 #plot-input .control-panel-input {
   background: #fff;
-  box-shadow: 3px 4px 7px 6px rgb(0 0 0 / 23%), 0 0px 0px 0px rgb(0 0 0 / 12%);
-  border-radius: 5px 40px 40px 5px;
+  border-radius: 5px;
+  box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 23%);
   padding: 15px 15px;
   margin: 20px 10px;
 }
