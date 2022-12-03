@@ -26,6 +26,13 @@ function ControlPanelInput(data, onChange, {
     const wrapper = document.createElement("div")
     wrapper.classList.add(groupWrappingClass)
     node.appendChild(wrapper)
+
+    const h4 = document.createElement("h4") //added title
+    h4.id = `${column}-title` 
+    h4.style.textAlign='center' //center aligned
+    h4.textContent = labels[column] ?? (" " +  column) 
+    wrapper.appendChild(h4)
+
     const input = document.createElement("input")
     input.type = "checkbox"
     input.id = `${column}-checkbox`
@@ -34,6 +41,7 @@ function ControlPanelInput(data, onChange, {
     const label = document.createElement("label")
     label.setAttribute("for", input.id)
     label.textContent = labels[column] ?? column
+    label.textContent = " " + label.textContent //added space
     wrapper.appendChild(label)
 
     // add event listener to update SPLIT_INPUT_VALUES
@@ -62,7 +70,7 @@ function ControlPanelInput(data, onChange, {
       subwrapper.appendChild(input)
       const label = document.createElement("label")
       label.setAttribute("for", input.id)
-      label.textContent = value
+      label.textContent = " "+ value //added space
       subwrapper.appendChild(label)
 
       // add event listener to update FILTER_INPUT_VALUES

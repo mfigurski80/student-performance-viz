@@ -26,11 +26,11 @@ async function main() {
     columns: ["gender", "race/ethnicity", "parental level of education", "lunch", "test preparation course"],
     defaultValues: { "gender": true },
     labels: {
-      "gender": "Gender Identity",
-      "race/ethnicity": "Race / Ethnicity",
-      "parental level of education": "Parental Level of Education",
-      "lunch": "Whether Participating in Free Lunch Program",
-      "test preparation course": "Whether Participating in Test Preparation Course",
+      "gender": "Gender Identity:",
+      "race/ethnicity": "Race / Ethnicity:",
+      "parental level of education": "Parental Level of Education:",
+      "lunch": "Free Lunch Program:",
+      "test preparation course": "Test Preparation Course:",
     }
   })
   panelNode.appendChild(controlPanel.node)
