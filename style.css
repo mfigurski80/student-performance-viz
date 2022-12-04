@@ -28,6 +28,10 @@ body {
     font-family: var(--ff-primary);
 }
 
+.section__title {
+    font-family: var(--ff-primary);
+}
+
 #plot-container {
   width: 100vw;
   max-height: 90vh;
