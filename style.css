@@ -30,8 +30,7 @@ body {
 
 .section__title {
     font-family: var(--ff-primary);
-    padding-left: 1em;
-    justify-content: center;
+    padding-left: 2em;
     margin-bottom: .25em;
     text-align: center;
 }
