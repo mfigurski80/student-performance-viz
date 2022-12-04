@@ -30,6 +30,7 @@ body {
 
 .section__title {
     font-family: var(--ff-primary);
+    margin-bottom: .25em;
 }
 
 #plot-container {
