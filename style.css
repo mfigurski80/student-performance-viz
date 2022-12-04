@@ -24,6 +24,10 @@
   box-sizing: border-box;
 }
 
+body {
+    font-family: var(--ff-primary);
+}
+
 #plot-container {
   width: 100vw;
   max-height: 90vh;
@@ -36,6 +40,7 @@
 }
 
 #plot-input .control-panel-input {
+  font-family: var(--ff-primary);
   background: #fff;
   border-radius: 5px;
   box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 23%);
