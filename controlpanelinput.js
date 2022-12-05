@@ -28,9 +28,9 @@ function ControlPanelInput(data, onChange, {
     node.appendChild(wrapper)
 
     const h4 = document.createElement("h4") //added title
-    h4.id = `${column}-title` 
-    h4.style.textAlign='center' //center aligned
-    h4.textContent = labels[column] ?? (" " +  column) 
+    h4.id = `${column}-title`
+    h4.style.textAlign = 'center' //center aligned
+    h4.textContent = labels[column] ?? (" " + column)
     wrapper.appendChild(h4)
 
     const input = document.createElement("input")
@@ -70,7 +70,7 @@ function ControlPanelInput(data, onChange, {
       subwrapper.appendChild(input)
       const label = document.createElement("label")
       label.setAttribute("for", input.id)
-      label.textContent = " "+ value //added space
+      label.textContent = " " + value //added space
       subwrapper.appendChild(label)
 
       // add event listener to update FILTER_INPUT_VALUES
@@ -84,5 +84,5 @@ function ControlPanelInput(data, onChange, {
 
   // run onChange with the initial values
   if (runOnChange) onChange(SPLIT_INPUT_VALUES, FILTER_INPUT_VALUES)
-  return { node }
+  return node
 }

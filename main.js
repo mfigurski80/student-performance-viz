@@ -33,7 +33,12 @@ async function main() {
       "test preparation course": "Test Preparation Course:",
     }
   })
-  panelNode.appendChild(controlPanel.node)
+  panelNode.appendChild(controlPanel)
+
+  // TODO: Set up the userdata input
+  // const userDataNode = UserDataInput(data, console.log)
+  // panelNode.appendChild(userDataNode)
+
 }
 
 // if document is ready
