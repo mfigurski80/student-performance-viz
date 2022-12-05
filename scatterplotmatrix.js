@@ -152,8 +152,8 @@ function ScatterplotMatrix(data, {
 function kernelDensityEstimator(kernel, X) {
   return function (V) {
     let v = X.map(x => [x, 2500 * d3.mean(V, v => kernel(x - v))])
-    v.push([v[v.length - 1][0], 0]) // add final point to ensure area 
-    return v
+    // add first & final point to ensure area 
+    return [[0, 0], ...v, [v[v.length - 1][0], 0]]
   };
 }
 function kernelEpanechnikov(k) {
