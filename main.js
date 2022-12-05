@@ -35,9 +35,12 @@ async function main() {
   })
   panelNode.appendChild(controlPanel)
 
-  // TODO: Set up the userdata input
-  // const userDataNode = UserDataInput(data, console.log)
-  // panelNode.appendChild(userDataNode)
+  // Set up the userdata input
+  const userDataNode = document.getElementById("user-data")
+  const dataInputNode = UserDataInput(data, console.log, {
+    numericInputs: ["reading score", "writing score", "math score"],
+  })
+  userDataNode.appendChild(dataInputNode)
 
 }
 
