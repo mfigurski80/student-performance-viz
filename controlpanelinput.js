@@ -32,17 +32,31 @@ function ControlPanelInput(data, onChange, {
     h4.style.textAlign = 'center' //center aligned
     h4.textContent = labels[column] ?? (" " + column)
     wrapper.appendChild(h4)
+    const subwrapper = document.createElement("div")
+    subwrapper.className = "control-panel-split"
+    subwrapper.textContent = "Split Inputs"
+    wrapper.appendChild(subwrapper)
 
+    const label = document.createElement("label")
+    label.className="outter"
+    
+    subwrapper.appendChild(label)
     const input = document.createElement("input")
     input.type = "checkbox"
-    input.id = `${column}-checkbox`
+    input.id = `${column}-toggle`
     input.checked = SPLIT_INPUT_VALUES.includes(column)
-    wrapper.appendChild(input)
-    const label = document.createElement("label")
-    label.setAttribute("for", input.id)
-    label.textContent = labels[column] ?? column
-    label.textContent = " " + label.textContent //added space
-    wrapper.appendChild(label)
+    label.appendChild(input)
+
+    const inner = document.createElement("div")
+    inner.className="inner"
+    inner.style.marginTop = "3px"
+    label.appendChild(inner)
+    const span = document.createElement("span")
+    span.className="on"
+    inner.appendChild(span)
+    const span2 = document.createElement("span")
+    span2.className="off"
+    inner.appendChild(span2)
 
     // add event listener to update SPLIT_INPUT_VALUES
     input.addEventListener("change", (e) => {
@@ -60,6 +74,7 @@ function ControlPanelInput(data, onChange, {
     // create filter input elements for each value in the column
     values.forEach(value => {
       // create checkbox input elements
+      // this block of code creates the checkboxes for the input variables ONLY look above for the split function 
       const subwrapper = document.createElement("div")
       subwrapper.classList.add(filterWrappingClass)
       wrapper.appendChild(subwrapper)
